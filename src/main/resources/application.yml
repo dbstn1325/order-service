@@ -1,0 +1,42 @@
+server:
+  port: 0
+
+spring:
+  application:
+    name: order-service
+  # mysql 설정
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    #    url: jdbc:mysql://localhost:3306/study
+    url: jdbc:mysql://localhost:3306/order_db # DB이름 (콘솔에서 create database product_db)
+    username: root
+    password: 1234
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: create-drop # DDL(create, alter, drop) 정의시 DB의 고유 기능을 사용할 수 있다. # 애플리케이션 실행 시점에 테이블 다 지우고 앤터티 보고 다시 생성
+      use-new-id-generator-mappings: false
+      show-sql: true # true 설정시 JPA 쿼리문 확인 가능
+      format_sql: true # JPA의 구현체인 Hibernate가 동작하면서 발생한 SQL의 가독성을 높여준다.
+      generate-ddl: true
+
+    properties:
+      hibernate:
+        globally_quoted_identifiers: true
+
+eureka:
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+    instance:
+      instance_id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+  hello:
+    message: 마이크로 서비스의 주문 서비스 입니다.
+
+  loggin:
+    level:
+        com.example.order: DEBUG
+
