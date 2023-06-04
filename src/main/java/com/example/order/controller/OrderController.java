@@ -41,6 +41,7 @@ public class OrderController {
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT); //연결 전략을 엄격하게 변경하여 같은 타입의 필드명 역시 같은 경우만 동작하도록 변경
         orderDto.setUserId(userId);
 
+        // Order micro service쪽의 DB 내에 먼저 저장
         OrderDto responseOrderDto = orderService.createOrder(orderDto);
 
         /* Kafka에 특정 토픽으로 주문 정보 message send (by Kafka Producer)
