@@ -28,9 +28,11 @@ public class KafkaProducer {
             jsonInString = mapper.writeValueAsString(orderDto);
         } catch (JsonProcessingException ex) {
             ex.printStackTrace();
+            log.info("err4rrasd");
         }
 
         kafkaTemplate.send(topic, jsonInString);
+        log.info("주문" + jsonInString);
         log.info("주문 micro service로부터 Kafka Producer를 통해 데이터를 전송 완료하였습니다.");
 
         return orderDto;
@@ -42,9 +44,13 @@ public class KafkaProducer {
         String jsonInString = "";                   //해당 string값의 모양새가 json형태로 표현되게끔 사용하겠습니다.
         try {
             jsonInString = mapper.writeValueAsString(orderDto);
+            log.info("hasd" + jsonInString);
         } catch (JsonProcessingException ex) {  // json 변환과정 예외처리
             ex.printStackTrace();
+            log.info("err4rrasd");
         }
+
+        log.info("hasd" + jsonInString);
 
         // 해당 item 갯수 갱신 (갯수 감소)
         try{

@@ -14,22 +14,26 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 @Table(name="orders")
 public class Order implements Serializable {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
     private String userId;
 
-    @Column(nullable = false, length = 120, unique = true)
+    @Column(nullable = false)
     private String productId;
+
     @Column(nullable = false)
     private int stock;
+
     @Column(nullable = false)
     private int unitPrice;
+
     @Column(nullable = false)
     private int totalPrice;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String orderId;
 
     @CreatedDate

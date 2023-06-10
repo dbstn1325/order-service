@@ -34,12 +34,12 @@ public class OrderController {
     @PostMapping("/{userId}/orders")
     public ResponseEntity<OrderResponse> createOrder(@PathVariable("userId") String userId, @RequestBody
     OrderRequest orderRequest) {
+        // OrderRequestDto -> OrderDto
         ModelMapper modelMapper = new ModelMapper();
-
-        /* jpa */
         OrderDto orderDto = modelMapper.map(orderRequest, OrderDto.class);
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT); //연결 전략을 엄격하게 변경하여 같은 타입의 필드명 역시 같은 경우만 동작하도록 변경
+//        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT); //연결 전략을 엄격하게 변경하여 같은 타입의 필드명 역시 같은 경우만 동작하도록 변경
         orderDto.setUserId(userId);
+
 
         // Order micro service쪽의 DB 내에 먼저 저장
         OrderDto responseOrderDto = orderService.createOrder(orderDto);
@@ -48,8 +48,6 @@ public class OrderController {
             *해당 토픽은 Product topic이 구독하고 있기 때문에 Product topic에서 해당 message를 받을 수 있습니다.
         */
         kafkaProducer.send("update-quantity-product", orderDto);
-
-
 
         OrderResponse orderResponse = modelMapper.map(responseOrderDto, OrderResponse.class);
 
