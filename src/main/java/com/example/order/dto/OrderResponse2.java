@@ -1,21 +1,19 @@
 package com.example.order.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class OrderResponse {
-    private String userId;
-
+@NoArgsConstructor
+@AllArgsConstructor
+public class OrderResponse2 {
     private String productId;
-    private String productName;
     private int quantity;
     private int unitPrice;
     private int totalPrice;
-    private String paymentMethod;
     private LocalDateTime createdAt;
 
     private String orderId;
