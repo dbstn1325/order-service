@@ -3,7 +3,9 @@ package com.example.order.controller;
 import com.example.order.dto.*;
 import com.example.order.exception.OrderCreationException;
 import com.example.order.messagequeue.KafkaProducer;
+import com.example.order.model.response.ListResult;
 import com.example.order.service.OrderService;
+import com.example.order.service.response.ResponseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -22,11 +24,14 @@ import java.util.List;
 public class OrderController {
     private final OrderService orderService;
     private final KafkaProducer kafkaProducer;
+    private final ResponseService responseService;
 
     /**
-     * 사용자의 주문을 생성하는 메서드
+     * 사용자의 단건 주문을 생성하는 메서드
      * @param userId: 사용자의 고유 ID
      * @param singleOrderRequest: 사용자가 주문한 상품 정보
+     * @return 주문 생성에 성공한 경우 생성된 주문에 대한 응답을 반환
+     * @throws OrderCreationException: 주문 생성 중 오류가 발생한 경우 예외를 발생시킴
      */
     @PostMapping("/{userId}/order")
     public ResponseEntity<SingleOrderResponse> createOrder(@PathVariable("userId") String userId, @RequestBody
@@ -56,6 +61,13 @@ public class OrderController {
                 .body(singleOrderResponse);
     }
 
+    /**
+     * 사용자의 다중 주문을 생성하는 메서드
+     *
+     * @param userId: 사용자의 고유 ID
+     * @param multipleOrderRequest: 사용자가 주문한 상품들에 대한 정보
+     * @return 주문 생성에 성공한 경우 생성된 주문들에 대한 응답을 반환
+     */
     @PostMapping("/{userId}/orders")
     public ResponseEntity<List<MultipleOrderResponse>> createOrders(@PathVariable("userId") String userId,
                                                                     @RequestBody MultipleOrderRequest multipleOrderRequest) {
@@ -68,31 +80,32 @@ public class OrderController {
 
     /**
      * 특정 사용자의 주문목록을 조회하는 메서드
+     *
      * @param userId 조회하고자 하는 사용자의 userID
      * @return 특정 사용자의 주문목록
      */
     @GetMapping("/{userId}/orders")
-    public ResponseEntity<List<SingleOrderResponse>> getOrdersByUserId(@PathVariable("userId") String userId){
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(orderService.getOrderByUserId(userId));
+    public ListResult<SingleOrderResponse> getOrdersByUserId(@PathVariable("userId") String userId){
+        return responseService.getListResult(orderService.getOrderByUserId(userId));
 
     }
 
-
+    /**
+     * 모든 사용자의 주문 목록을 조회하는 메서드
+     *
+     * @return 모든 사용자의 주문 목록
+     */
     @GetMapping("/orders")
-    public ResponseEntity<List<SingleOrderResponse>> findAllOrders(){
+    public ListResult<SingleOrderResponse> findAllOrders(){
         List<OrderDto> orders = orderService.getAllOrders();
-        List<SingleOrderResponse> singleOrderRespons = new ArrayList<>();
+        List<SingleOrderResponse> singleOrderResponse = new ArrayList<>();
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        orders.forEach(v -> singleOrderRespons.add(
+        orders.forEach(v -> singleOrderResponse.add(
                 modelMapper.map(v, SingleOrderResponse.class)
         ));
 
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(singleOrderRespons);
+        return responseService.getListResult(singleOrderResponse);
     }
 }
