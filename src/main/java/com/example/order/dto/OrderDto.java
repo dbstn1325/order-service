@@ -10,9 +10,11 @@ public class OrderDto implements Serializable {
     private String userId;
 
     private String productId;
-    private int stock;
+    private String productName;
+    private int quantity;
     private int unitPrice;
     private int totalPrice;
+    private String paymentMethod;
 
     private String orderId;
 }

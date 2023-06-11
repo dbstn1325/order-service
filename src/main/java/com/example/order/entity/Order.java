@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class Order implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long orderId;
 
     @Column(nullable = false)
     private String userId;
@@ -25,7 +25,10 @@ public class Order implements Serializable {
     private String productId;
 
     @Column(nullable = false)
-    private int stock;
+    private String productName;
+
+    @Column(nullable = false)
+    private int quantity;
 
     @Column(nullable = false)
     private int unitPrice;
@@ -34,7 +37,11 @@ public class Order implements Serializable {
     private int totalPrice;
 
     @Column(nullable = false)
-    private String orderId;
+    private String paymentMethod;
+
+
+//    @Column(nullable = false)
+//    private String orderId;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
