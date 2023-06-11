@@ -1,14 +1,12 @@
 package com.example.order.messagequeue;
 
-import com.example.order.dto.CartInfoDto;
+import com.example.order.dto.CartDto;
 import com.example.order.dto.OrderDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.kafka.KafkaException;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.listener.ListenerExecutionFailedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -42,11 +40,11 @@ public class KafkaProducer {
         return orderDto;
     }
 
-    public void removeCart(String topic, List<CartInfoDto> cartInfoDtos) {
+    public void removeCart(String topic, List<CartDto> cartDtos) {
 
         String jsonInString = "";
         try {
-            jsonInString = objectMapper.writeValueAsString(cartInfoDtos);
+            jsonInString = objectMapper.writeValueAsString(cartDtos);
         } catch (JsonProcessingException e) {
             log.info("Cart microservice producer error");
             throw new RuntimeException(e);

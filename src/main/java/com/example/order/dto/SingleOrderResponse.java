@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class OrderResponse {
+public class SingleOrderResponse {
     private String userId;
 
     private String productId;
