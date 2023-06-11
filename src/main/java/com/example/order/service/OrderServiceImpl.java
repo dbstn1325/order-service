@@ -150,6 +150,12 @@ public class OrderServiceImpl implements OrderService {
 
 
 
+    /**
+     * 주어진 주문 ID에 해당하는 주문을 조회해서 반환
+     *
+     * @param orderId 주문 ID
+     * @return 주문 ID에 해당하는 주문 정보
+     */
     @Override
     public OrderDto getOrderByOrderId(String orderId) {
         Order order = orderRepository.findByOrderId(orderId);
@@ -161,6 +167,11 @@ public class OrderServiceImpl implements OrderService {
         return orderDto;
     }
 
+    /**
+     * 모든 주문들을 조회해서 반환
+     *
+     * @return 모든 주문들의 목록
+     */
     @Override
     public List<OrderDto> getAllOrders() {
         List<Order> orders = orderRepository.findAll();
