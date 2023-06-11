@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,13 +58,13 @@ public class OrderServiceImpl implements OrderService {
      * 장바구니 정보도 Kafka에 전송
      *
      * @param userId 사용자 ID
-     * @param orderRequest2 주문 요청 정보
+     * @param multipleOrderRequest 주문 요청 정보
      * @return 생성된 주문 목록
      */
     @Override
-    public List<OrderResponse2> createOrders(String userId, OrderRequest2 orderRequest2) {
-        sendCartInfosToKafka(orderRequest2);
-        List<Order> orders = createOrdersFromRequest(userId, orderRequest2);
+    public List<MultipleOrderResponse> createOrders(String userId, MultipleOrderRequest multipleOrderRequest) {
+        sendCartInfosToKafka(multipleOrderRequest);
+        List<Order> orders = createOrdersFromRequest(userId, multipleOrderRequest);
         List<Order> savedOrders = orderRepository.saveAll(orders);
 
         return convertToOrderResponse2List(savedOrders);
@@ -74,11 +73,11 @@ public class OrderServiceImpl implements OrderService {
     /**
      * 주어진 주문 요청 정보에 있는 장바구니 정보를 Kafka에 전송
      *
-     * @param orderRequest2 주문 요청 정보
+     * @param multipleOrderRequest 주문 요청 정보
      */
-    private void sendCartInfosToKafka(OrderRequest2 orderRequest2) {
-        List<CartInfoDto> cartInfos = orderRequest2.getItems().stream()
-                .map(item -> new CartInfoDto(item.getCartId()))
+    private void sendCartInfosToKafka(MultipleOrderRequest multipleOrderRequest) {
+        List<CartDto> cartInfos = multipleOrderRequest.getItems().stream()
+                .map(item -> new CartDto(item.getCartId()))
                 .collect(Collectors.toList());
 
         kafkaProducer.removeCart("cart-info-topic", cartInfos);
@@ -88,12 +87,12 @@ public class OrderServiceImpl implements OrderService {
      * 주어진 사용자 ID와 주문 요청 정보를 이용해서 주문 목록 생성
      *
      * @param userId 사용자 ID
-     * @param orderRequest2 주문 요청 정보
+     * @param multipleOrderRequest 주문 요청 정보
      * @return 생성된 주문 목록
      */
-    private List<Order> createOrdersFromRequest(String userId, OrderRequest2 orderRequest2) {
-        return orderRequest2.getItems().stream()
-                .map(item -> createSingleOrder(userId, item, orderRequest2.getPaymentMethod()))
+    private List<Order> createOrdersFromRequest(String userId, MultipleOrderRequest multipleOrderRequest) {
+        return multipleOrderRequest.getItems().stream()
+                .map(item -> createSingleOrder(userId, item, multipleOrderRequest.getPaymentMethod()))
                 .collect(Collectors.toList());
     }
 
@@ -122,7 +121,7 @@ public class OrderServiceImpl implements OrderService {
      * @param orders 주문 목록
      * @return 변환된 OrderResponse2 목록
      */
-    private List<OrderResponse2> convertToOrderResponse2List(List<Order> orders) {
+    private List<MultipleOrderResponse> convertToOrderResponse2List(List<Order> orders) {
         return orders.stream()
                 .map(modelMapperUtil::convertToOrderResponse2)
                 .collect(Collectors.toList());
@@ -135,15 +134,15 @@ public class OrderServiceImpl implements OrderService {
      * @return 사용자의 주문 목록
      */
     @Override
-    public List<OrderResponse> getOrderByUserId(String userId) {
+    public List<SingleOrderResponse> getOrderByUserId(String userId) {
         List<Order> orders = orderRepository.findByUserId(userId);
 
-        List<OrderResponse> result = new ArrayList<>();
+        List<SingleOrderResponse> result = new ArrayList<>();
 
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         orders.forEach(v->
-                result.add(modelMapper.map(v, OrderResponse.class)
+                result.add(modelMapper.map(v, SingleOrderResponse.class)
                 ));
 
         return result;

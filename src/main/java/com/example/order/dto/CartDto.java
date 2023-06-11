@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class CartInfoDto {
+public class CartDto {
     private String cartId;
 }

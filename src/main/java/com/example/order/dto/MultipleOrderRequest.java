@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderRequest2 {
+public class MultipleOrderRequest {
     private List<ItemDto> items;
     private String paymentMethod;
 }

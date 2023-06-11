@@ -4,7 +4,6 @@ import com.example.order.dto.*;
 import com.example.order.exception.OrderCreationException;
 import com.example.order.messagequeue.KafkaProducer;
 import com.example.order.service.OrderService;
-import com.fasterxml.jackson.core.JsonParseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -15,8 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,18 +26,18 @@ public class OrderController {
     /**
      * 사용자의 주문을 생성하는 메서드
      * @param userId: 사용자의 고유 ID
-     * @param orderRequest: 사용자가 주문한 상품 정보
+     * @param singleOrderRequest: 사용자가 주문한 상품 정보
      */
     @PostMapping("/{userId}/order")
-    public ResponseEntity<OrderResponse> createOrder(@PathVariable("userId") String userId, @RequestBody
-    OrderRequest orderRequest) throws OrderCreationException {
+    public ResponseEntity<SingleOrderResponse> createOrder(@PathVariable("userId") String userId, @RequestBody
+    SingleOrderRequest singleOrderRequest) throws OrderCreationException {
         // OrderRequestDto -> OrderDto
         ModelMapper modelMapper = new ModelMapper();
-        OrderDto orderDto = modelMapper.map(orderRequest, OrderDto.class);
+        OrderDto orderDto = modelMapper.map(singleOrderRequest, OrderDto.class);
 //        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT); //연결 전략을 엄격하게 변경하여 같은 타입의 필드명 역시 같은 경우만 동작하도록 변경
         orderDto.setUserId(userId);
         orderDto.setTotalPrice(orderDto.getQuantity() * orderDto.getUnitPrice());
-        orderDto.setPaymentMethod(orderRequest.getPaymentMethod());
+        orderDto.setPaymentMethod(singleOrderRequest.getPaymentMethod());
 
 
 
@@ -52,18 +49,18 @@ public class OrderController {
         */
         kafkaProducer.send("update-quantity-product", orderDto);
 
-        OrderResponse orderResponse = modelMapper.map(responseOrderDto, OrderResponse.class);
+        SingleOrderResponse singleOrderResponse = modelMapper.map(responseOrderDto, SingleOrderResponse.class);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(orderResponse);
+                .body(singleOrderResponse);
     }
 
     @PostMapping("/{userId}/orders")
-    public ResponseEntity<List<OrderResponse2>> createOrders(@PathVariable("userId") String userId,
-        @RequestBody OrderRequest2 orderRequest2) {
+    public ResponseEntity<List<MultipleOrderResponse>> createOrders(@PathVariable("userId") String userId,
+                                                                    @RequestBody MultipleOrderRequest multipleOrderRequest) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                        .body(orderService.createOrders(userId, orderRequest2));
+                        .body(orderService.createOrders(userId, multipleOrderRequest));
     }
 
 
@@ -75,7 +72,7 @@ public class OrderController {
      * @return 특정 사용자의 주문목록
      */
     @GetMapping("/{userId}/orders")
-    public ResponseEntity<List<OrderResponse>> getOrdersByUserId(@PathVariable("userId") String userId){
+    public ResponseEntity<List<SingleOrderResponse>> getOrdersByUserId(@PathVariable("userId") String userId){
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(orderService.getOrderByUserId(userId));
@@ -84,18 +81,18 @@ public class OrderController {
 
 
     @GetMapping("/orders")
-    public ResponseEntity<List<OrderResponse>> findAllOrders(){
+    public ResponseEntity<List<SingleOrderResponse>> findAllOrders(){
         List<OrderDto> orders = orderService.getAllOrders();
-        List<OrderResponse> orderResponses = new ArrayList<>();
+        List<SingleOrderResponse> singleOrderRespons = new ArrayList<>();
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        orders.forEach(v -> orderResponses.add(
-                modelMapper.map(v, OrderResponse.class)
+        orders.forEach(v -> singleOrderRespons.add(
+                modelMapper.map(v, SingleOrderResponse.class)
         ));
 
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(orderResponses);
+                .body(singleOrderRespons);
     }
 }

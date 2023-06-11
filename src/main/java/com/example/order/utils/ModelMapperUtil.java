@@ -27,7 +27,7 @@ public class ModelMapperUtil {
         return modelMapper.map(item, OrderDto.class);
     }
 
-    public OrderResponse2 convertToOrderResponse2(Order order) {
-        return modelMapper.map(order, OrderResponse2.class);
+    public MultipleOrderResponse convertToOrderResponse2(Order order) {
+        return modelMapper.map(order, MultipleOrderResponse.class);
     }
 }
