@@ -12,6 +12,8 @@ public class SingleOrderResponse {
 
     private String productId;
     private String productName;
+    private String productMadeBy;
+    private String productImage;
     private int quantity;
     private int unitPrice;
     private int totalPrice;

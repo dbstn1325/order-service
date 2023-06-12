@@ -28,6 +28,12 @@ public class Order implements Serializable {
     private String productName;
 
     @Column(nullable = false)
+    private String productMadeBy;
+
+    @Column(nullable = false)
+    private String productImage;
+
+    @Column(nullable = false)
     private int quantity;
 
     @Column(nullable = false)
